@@ -3,17 +3,24 @@
 #include<ctime>
 #include "skiplist.hpp"
 
+constexpr auto DEBUG = false;
+
 
 int main() {
 	srand(time(nullptr));
 	SkipList<int, std::string> skipList(6);
-	skipList.insert_element(1, "学");
-	skipList.insert_element(3, "算法");
-	skipList.insert_element(7, "认准");
-	skipList.insert_element(8, "微信公众号：代码随想录");
-	skipList.insert_element(9, "学习");
-	skipList.insert_element(19, "算法不迷路");
-	skipList.insert_element(19, "赶快关注吧你会发现详见很晚！");
+	skipList.insert_element(1, "zhangsan");
+	skipList.insert_element(3, "lisi");
+	skipList.insert_element(7, "hajier");
+	skipList.insert_element(8, "wangwu");
+	skipList.insert_element(9, "chengdu");
+	skipList.display_list();
+	skipList.search_element(7);
+	
+	skipList.insert_element(19, "majiang");
+	skipList.insert_element(19, "rapper");
+	skipList.delete_element(9);
+	skipList.display_list();
 
 	return 0;
 }
