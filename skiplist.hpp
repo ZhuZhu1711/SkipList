@@ -11,6 +11,8 @@
 
 
 std::mutex mtx;
+std::string STORE_FILE = "dumpFile";
+char delimiter = ':';
 
 template<typename K, typename V>
 class Node {
@@ -46,13 +48,13 @@ public:
 	bool delete_element(K);
 	void clear(Node<K, V>*);
 //	int size();
-//
-//	void dump_file();
-//	void load_file();
-//
-//private:
-//	void get_key_value_from_string(const std::string& str, std::string* key, std::string* value);
-//	bool is_valid_string(const std::string& str);
+
+	void dump_file();
+	void load_file();
+
+private:
+	void get_key_value_from_string(const std::string& str, std::string* key, std::string* value);
+	bool is_valid_string(const std::string& str);
 
 private:
 	int _max_level;						// 最大层级
@@ -133,6 +135,54 @@ void SkipList<K, V>::clear(Node<K, V>* cur) {
 		clear(cur->forward[0]);
 	}
 	delete(cur);
+}
+
+template<typename K, typename V>
+void SkipList<K, V>::dump_file()
+{
+	_file_writer.open(STORE_FILE);
+	Node<K, V>* node = _header->forward[0];
+	while (node != nullptr) {
+		_file_writer << node->get_key() << ":" << node->get_value() << ";\n";
+		node = node->forward[0];
+	}
+	_file_writer.flush();
+	_file_writer.close();
+}
+
+template<typename K, typename V>
+void SkipList<K, V>::load_file()
+{
+	_file_reader.open(STORE_FILE);
+	std::string line;
+	std::string* key = new std::string();
+	std::string* value = new std::string();
+
+	while (getline(_file_reader, line)) {
+		get_key_value_from_string(line, key, value);
+		if (key->empty() || value->empty()) continue;
+
+		insert_element(stoi(*key), *value);
+		std::cout << "key:" << *key << "value:" << *value << std::endl;
+	}
+	delete key;
+	delete value;
+	_file_reader.close();
+}
+
+template <typename K, typename V>
+bool SkipList<K, V>::is_valid_string(const std::string& str) {
+	return !str.empty() && str.find(delimiter) != std::string::npos;
+}
+
+template<typename K, typename V>
+void SkipList<K, V>::get_key_value_from_string(const std::string& str, std::string* key, std::string* value)
+{
+	if (!is_valid_string(str)) {
+		return;
+	}
+	*key = str.substr(0, str.find(delimiter));
+	*value = str.substr(str.find(delimiter) + 1, str.length());
 }
 
 template<typename K, typename V>
